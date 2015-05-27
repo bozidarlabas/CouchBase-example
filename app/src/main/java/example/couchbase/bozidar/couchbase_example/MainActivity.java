@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
 
@@ -22,13 +24,36 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         //CouchBase manager
-        Manager couchBaseManager;
+        Manager couchBaseManager = null;
         try {
             couchBaseManager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "Manager created");
+
+        createDatabase(couchBaseManager);
+
+
+    }
+
+    private void createDatabase(Manager manager) {
+        // create a name for the database and make sure the name is legal
+        String dbName = "test";
+        if(!Manager.isValidDatabaseName(dbName)){
+            Log.d(TAG, "Incorect database name");
+            return;
+        }
+
+        //create a new database
+        Database database;
+        try{
+            database = manager.getDatabase(dbName);
+            Log.d(TAG, "Database is created");
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Cannot get database");
+            return;
+        }
     }
 
     @Override
