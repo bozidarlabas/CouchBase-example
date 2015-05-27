@@ -2,16 +2,33 @@ package example.couchbase.bozidar.couchbase_example;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
+
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity {
+
+    final String TAG = "CouchBase";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //CouchBase manager
+        Manager couchBaseManager;
+        try {
+            couchBaseManager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "Manager created");
     }
 
     @Override
