@@ -22,9 +22,10 @@ import java.util.Map;
 
 public class MainActivity extends ActionBarActivity {
 
-    private final String TAG = "CouchBase";
+    private final String TAG = "CouchBaseTest";
     private Database database;
     private Manager couchBaseManager;
+    private String docId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,34 @@ public class MainActivity extends ActionBarActivity {
 
         createDocument();
 
+        readDocument();
 
+        updateDocument();
+
+
+    }
+
+    private void updateDocument(){
+        Document retrievedDocument = database.getDocument(docId);
+
+        Map<String,Object> updatedProperties = new HashMap<>();
+        updatedProperties.putAll(retrievedDocument.getProperties());
+        updatedProperties.put("message", "Updated message");
+        updatedProperties.put("message2", "Updated message2");
+
+        try {
+            retrievedDocument.putProperties(updatedProperties);
+            Log.d(TAG, "updated retrievedDocument=" + String.valueOf(retrievedDocument.getProperties()));
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void readDocument(){
+        Document retrievedDocument = database.getDocument(docId);
+        Log.d(TAG, "retrieved document: " + String.valueOf(retrievedDocument.getProperties()));
     }
 
     private void createManager(){
@@ -52,7 +80,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void createDocument() {
-
 
         // create an object that contains data for a document
         Map<String, Object> docContent = new HashMap<>();
@@ -69,8 +96,7 @@ public class MainActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
-        String docID = document.getId();
-
+        docId = document.getId();
     }
 
     private void createDatabase() {
