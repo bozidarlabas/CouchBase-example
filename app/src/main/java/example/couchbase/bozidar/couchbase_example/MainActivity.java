@@ -8,35 +8,72 @@ import android.view.MenuItem;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    final String TAG = "CouchBase";
+    private final String TAG = "CouchBase";
+    private Database database;
+    private Manager couchBaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        createManager();
+
+        createDatabase();
+
+        createDocument();
+
+
+    }
+
+    private void createManager(){
         //CouchBase manager
-        Manager couchBaseManager = null;
         try {
             couchBaseManager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        createDatabase(couchBaseManager);
+    private void createDocument() {
 
+
+        // create an object that contains data for a document
+        Map<String, Object> docContent = new HashMap<>();
+        docContent.put("message", "Hello Couchbase Lite");
+        docContent.put("message2", "Hello CouchBase Lite2");
+
+        //Create an emtpy document
+        Document document = database.createDocument();
+
+        try {
+            document.putProperties(docContent);
+            Log.d (TAG, "Document written to database " + " with ID = " + document.getId());
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        String docID = document.getId();
 
     }
 
-    private void createDatabase(Manager manager) {
+    private void createDatabase() {
         // create a name for the database and make sure the name is legal
         String dbName = "test";
         if(!Manager.isValidDatabaseName(dbName)){
@@ -45,9 +82,8 @@ public class MainActivity extends ActionBarActivity {
         }
 
         //create a new database
-        Database database;
         try{
-            database = manager.getDatabase(dbName);
+            database = couchBaseManager.getDatabase(dbName);
             Log.d(TAG, "Database is created");
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
